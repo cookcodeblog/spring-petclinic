@@ -18,7 +18,7 @@ pipeline {
     stages {
         stage('Build App') {
             steps {
-                git branch: "${APP_GIT_BRANCH}", url: "${APP_GIT_REPO}"
+                git branch: "${env.APP_GIT_BRANCH}", url: "${env.APP_GIT_REPO}"
                 sh "${mvnCmd} clean install -DskipTests=true"
             }
         }
