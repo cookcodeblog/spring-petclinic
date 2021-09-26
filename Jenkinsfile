@@ -1,7 +1,7 @@
 def mvnCmd = "mvn -s nexus-settings.xml -U -B"
 pipeline {
     agent {
-        abel "maven"
+        label "maven"
     }
 
     environment {
