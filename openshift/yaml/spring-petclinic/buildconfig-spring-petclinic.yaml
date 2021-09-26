@@ -25,6 +25,9 @@ spec:
     type: Git
   strategy:
     sourceStrategy:
+      env:
+        - name: MAVEN_MIRROR_URL
+          value: http://nexus3.opentlc-shared.svc.cluster.local:8081/repository/maven-all-public
       from:
         kind: ImageStreamTag
         name: openjdk-11-rhel7:1.1
