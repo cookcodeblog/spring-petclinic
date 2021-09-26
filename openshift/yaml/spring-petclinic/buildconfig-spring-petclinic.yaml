@@ -1,0 +1,44 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  labels:
+    app: spring-petclinic
+    app.kubernetes.io/component: spring-petclinic
+    app.kubernetes.io/instance: spring-petclinic
+  name: spring-petclinic
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: spring-petclinic:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      ref: main
+      uri: https://github.com/cookcodeblog/spring-petclinic.git
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-11-rhel7:1.1
+        namespace: openshift
+    type: Source
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - github:
+      secret: JayYdzKM3SqG_rI8vftI
+    type: GitHub
+  - generic:
+      secret: ClzTkSLqOd-oQ8MuxYJs
+    type: Generic
+  - type: ConfigChange
+  - imageChange:
+      lastTriggeredImageID: image-registry.openshift-image-registry.svc:5000/openshift/openjdk-11-rhel7@sha256:c343983d08baf2b3cc19483734808b07523a0860a5b17fdcb32de2d1b85306ca
+    type: ImageChange
