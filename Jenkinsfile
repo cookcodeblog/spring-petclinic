@@ -1,7 +1,7 @@
-def mvnCmd = "mvn -s nexus-settings.xml -U -B"
+def mvnCmd = "mvn -s nexus-settings.xml"
 pipeline {
     agent {
-        label "master"
+        label "maven"
     }
 
     environment {
@@ -17,22 +17,12 @@ pipeline {
 
     stages {
         stage('Build App') {
-            agent {
-                node {
-                    label "maven"  
-                }
-            }
             steps {
                 git branch: "${env.APP_GIT_BRANCH}", url: "${env.APP_GIT_REPO}"
                 sh "${mvnCmd} clean install -DskipTests=true"
             }
         }
         stage('Test') {
-            agent {
-                node {
-                    label "maven"  
-                }
-            }
             steps {
                 sh "${mvnCmd} test"
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
