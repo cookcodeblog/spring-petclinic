@@ -1,7 +1,7 @@
 def mvnCmd = "mvn -s nexus-settings.xml -U -B"
 pipeline {
     agent {
-        label "maven"
+        label "master"
     }
 
     environment {
@@ -17,6 +17,11 @@ pipeline {
 
     stages {
         stage('Build App') {
+            agent {
+                node {
+                    label "jenkins-agent-maven"  
+                }
+            }
             steps {
                 git branch: "${env.APP_GIT_BRANCH}", url: "${env.APP_GIT_REPO}"
                 sh "${mvnCmd} clean install -DskipTests=true"
