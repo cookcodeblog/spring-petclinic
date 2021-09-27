@@ -170,7 +170,7 @@ under the License.
 			<mirrorOf>*</mirrorOf>
 			<name>Internal Maven Repo</name>
 <!--			<url>http://nexus3.opentlc-shared.svc.cluster.local:8081/repository/maven-all-public</url>-->
-			<url>http://sonatype-nexus-service.will-cicd.svc.cluster.local:8081/repository/maven-all-public</url>
+			<url>http://sonatype-nexus-service.will-cicd.svc.cluster.local:8081/repository/maven-public</url>
 		</mirror>
 
 
