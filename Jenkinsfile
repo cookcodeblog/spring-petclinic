@@ -28,13 +28,13 @@ pipeline {
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
             }
         }
-    }
-
-    stage('Code Analysis') {
-        steps {
-            script {
-            sh "${mvnCmd} install sonar:sonar -Dsonar.host.url=http://sonarqube-sonarqube:9000 -DskipTests=true"
+         stage('Code Analysis') {
+            steps {
+                script {
+                sh "${mvnCmd} install sonar:sonar -Dsonar.host.url=http://sonarqube-sonarqube:9000 -DskipTests=true"
+                }
             }
         }
     }
+   
 }
