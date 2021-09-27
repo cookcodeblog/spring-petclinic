@@ -29,4 +29,12 @@ pipeline {
             }
         }
     }
+
+    stage('Code Analysis') {
+        steps {
+            script {
+            sh "${mvnCmd} install sonar:sonar -Dsonar.host.url=http://sonarqube-sonarqube:9000 -DskipTests=true"
+            }
+        }
+    }
 }
