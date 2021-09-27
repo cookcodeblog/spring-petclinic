@@ -31,7 +31,11 @@ pipeline {
          stage('Code Analysis') {
             steps {
                 script {
-                sh "${mvnCmd} install sonar:sonar -Dsonar.host.url=http://sonarqube-sonarqube.will-cicd-sonarqube:9000 -DskipTests=true"
+                    // need install SonarQube Scanner plugin and configure SonarQube server in Jenkins
+                    // -Dsonar.host.url=http://sonarqube-sonarqube.will-cicd-sonarqube:9000
+                    withSonarQubeEnv('sonarqube') {
+                        sh "${mvnCmd} install sonar:sonar -Dsonar.host.url=http://sonarqube-sonarqube.will-cicd-sonarqube:9000 -DskipTests=true"
+                    }
                 }
             }
         }
