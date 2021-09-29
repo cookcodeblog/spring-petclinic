@@ -18,6 +18,7 @@ pipeline {
     stages {
         stage('Build App') {
             steps {
+                // TODO: support multi branches
                 git branch: "${env.APP_GIT_BRANCH}", url: "${env.APP_GIT_REPO}"
                 sh "${mvnCmd} clean install -DskipTests=true"
             }
@@ -28,13 +29,13 @@ pipeline {
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
             }
         }
-         stage('Code Analysis') {
+        stage('Code Analysis') {
             steps {
                 script {
                     // need install SonarQube Scanner plugin and configure SonarQube server in Jenkins
                     // -Dsonar.host.url=http://sonarqube-sonarqube.will-cicd-sonarqube:9000
                     withSonarQubeEnv('sonarqube') {
-                        sh "${mvnCmd} install sonar:sonar -Dsonar.host.url=http://sonarqube-sonarqube.will-cicd-sonarqube:9000 -DskipTests=true"
+                        sh "${mvnCmd} install sonar:sonar -DskipTests=true"
                     }
                 }
             }
