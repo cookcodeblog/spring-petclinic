@@ -16,11 +16,16 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Environment') {
+            steps {
+                sh 'printenv'
+            }
+        }
         stage('Build App') {
             steps {
                 // TODO: support multi branches
                 //git branch: "${env.APP_GIT_BRANCH}", url: "${env.APP_GIT_REPO}"
-                git url: "${GIT_SOURCE_URL}", branch: "${GIT_SOURCE_REF}"
+                // git url: "${GIT_SOURCE_URL}", branch: "${GIT_SOURCE_REF}"
                 sh "${mvnCmd} clean install -DskipTests=true"
             }
         }
