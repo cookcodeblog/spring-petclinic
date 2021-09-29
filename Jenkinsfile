@@ -6,10 +6,17 @@ pipeline {
 
     environment {
         // define glolab vars
-        foo="bar"
+        //foo="bar"
 
         //APP_GIT_REPO = "https://github.com/cookcodeblog/spring-petclinic.git"
         //APP_GIT_BRANCH = "main"
+
+        PIPELINES_NAMESPACE = "will-cicd-jenkins"
+
+        // applicaiton info
+        PROJECT_NAMESPACE = "will-petclinic"
+        APP_NAME = "spring-petclinic"
+        APP_BUILD_CONFIG = "spring-petclinic"
         
     }
 
@@ -57,7 +64,22 @@ pipeline {
         }
         stage('Archive App') {
             steps {
+                // need create `nx-deploy` Nexus role, and create `jenkins-user` Nexus user with this role
+                // configure `jenkins-user` login information in settings.xml
+                // configure repository information in pom.xml
                 sh "${mvnCmd} deploy -DskipTests=true"
+            }
+        }
+        stage('Build Image') {
+            steps {
+                sh "cp target/${env.APP_NAME}-*.jar target/app.jar"
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject(env.PROJECT_NAMESPACE) {
+                            openshift.selector("bc", "${env.APP_BUILD_CONFIG}").startBuild("--from-file=target/app.jar", "--wait=true")
+                        }
+                    }
+                }
             }
         }
     }
