@@ -24,7 +24,7 @@ pipeline {
             steps {
                 // https://e.printstacktrace.blog/jenkins-pipeline-environment-variables-the-definitive-guide/
                 // https://{JENKINS_HOST}/env-vars.html/
-                // Examples:
+                // Jenkins built-in env vars examples:
                 // BRANCH_NAME=main
                 // GIT_BRANCH=main
                 // GIT_URL=https://github.com/cookcodeblog/spring-petclinic.git
@@ -55,11 +55,11 @@ pipeline {
                 }
             }
         }
-        // stage('Archive App') {
-        //     steps {
-        //         sh "${mvnCmd} deploy -DskipTests=true"
-        //     }
-        // }
+        stage('Archive App') {
+            steps {
+                sh "${mvnCmd} deploy -DskipTests=true"
+            }
+        }
     }
    
 }
