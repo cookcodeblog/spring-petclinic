@@ -5,8 +5,12 @@ pipeline {
     }
 
     environment {
+        // define glolab vars
+        foo="bar"
+        
         //APP_GIT_REPO = "https://github.com/cookcodeblog/spring-petclinic.git"
         //APP_GIT_BRANCH = "main"
+        
     }
 
     options {
