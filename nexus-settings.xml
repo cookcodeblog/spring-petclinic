@@ -132,6 +132,11 @@ under the License.
 		-->
 
 		<server>
+			<id>internalmaven</id>
+			<username>jenkins-user</username>
+			<password>jenkins123</password>
+		</server>
+		<server>
 			<id>nexus-snapshots</id>
 			<username>jenkins-user</username>
 			<password>jenkins123</password>
@@ -274,6 +279,8 @@ under the License.
 		  </properties>
 		</profile>
 		-->
+
+
 	</profiles>
 
 	<!-- activeProfiles
