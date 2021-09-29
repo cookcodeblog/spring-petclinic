@@ -7,7 +7,7 @@ pipeline {
     environment {
         // define glolab vars
         foo="bar"
-        
+
         //APP_GIT_REPO = "https://github.com/cookcodeblog/spring-petclinic.git"
         //APP_GIT_BRANCH = "main"
         
@@ -22,14 +22,19 @@ pipeline {
     stages {
         stage('Prepare Environment') {
             steps {
+                // https://e.printstacktrace.blog/jenkins-pipeline-environment-variables-the-definitive-guide/
+                // https://{JENKINS_HOST}/env-vars.html/
+                // Examples:
+                // BRANCH_NAME=main
+                // GIT_BRANCH=main
+                // GIT_URL=https://github.com/cookcodeblog/spring-petclinic.git
+                // BUILD_NUMBER=10
                 sh 'printenv'
+
             }
         }
         stage('Build App') {
             steps {
-                // TODO: support multi branches
-                //git branch: "${env.APP_GIT_BRANCH}", url: "${env.APP_GIT_REPO}"
-                // git url: "${GIT_SOURCE_URL}", branch: "${GIT_SOURCE_REF}"
                 sh "${mvnCmd} clean install -DskipTests=true"
             }
         }
