@@ -8,15 +8,16 @@ pipeline {
         // define glolab vars
         //foo="bar"
 
-        //APP_GIT_REPO = "https://github.com/cookcodeblog/spring-petclinic.git"
-        //APP_GIT_BRANCH = "main"
-
         PIPELINES_NAMESPACE = "will-cicd-jenkins"
 
         // applicaiton info
         PROJECT_NAMESPACE = "will-petclinic"
         APP_NAME = "spring-petclinic"
-        APP_BUILD_CONFIG = "spring-petclinic"
+        APP_BUILD_CONFIG = "${env.APP_NAME}"
+        APP_DEPLOYMENT = "${env.APP_NAME}"
+        APP_GIT_MAIN_BRANCH = "main"
+        // TODO App version
+        APP_VERSION = "0.0.1"
         
     }
 
@@ -64,9 +65,10 @@ pipeline {
         }
         stage('Archive App') {
             steps {
-                // need create `nx-deploy` Nexus role, and create `jenkins-user` Nexus user with this role
-                // configure `jenkins-user` login information in settings.xml
-                // configure repository information in pom.xml
+                // need create `nx-deploy` Nexus role with `nx-repository-view-*-*-*` privileges
+                // create `jenkins-user` Nexus user with this role
+                // configure `jenkins-user` server login information for repositories and mirror in settings.xml
+                // configure repository information in `distributionManagement` of pom.xml
                 sh "${mvnCmd} deploy -DskipTests=true"
             }
         }
@@ -75,10 +77,22 @@ pipeline {
                 sh "cp target/${env.APP_NAME}-*.jar target/app.jar"
                 script {
                     openshift.withCluster() {
-                        openshift.withProject(env.PROJECT_NAMESPACE) {
+                        openshift.withProject("${env.PROJECT_NAMESPACE}") {
+                            // start a build for selected openshift build config
                             openshift.selector("bc", "${env.APP_BUILD_CONFIG}").startBuild("--from-file=target/app.jar", "--wait=true")
+                            // tag image
+                            openshift.tag("${env.APP_NAME}:latest", "${env.APP_NAME}:${env.APP_VERSION}")
+                            // TODO push image to external image registry
+                            // TODO git tag
                         }
                     }
+                }
+            }
+        }
+        stage('Deploy Image') {
+            openshift.withCluster() {
+                openshift.withProject("${env.PROJECT_NAMESPACE}") {
+                    openshift.selector("deployment", "${env.APP_DEPLOYMENT}").rollout().latest();
                 }
             }
         }
