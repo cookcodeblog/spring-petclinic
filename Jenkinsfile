@@ -1,4 +1,3 @@
-def mvnCmd = "mvn -s nexus-settings.xml"
 pipeline {
     agent {
         label 'maven'
@@ -6,7 +5,7 @@ pipeline {
 
     environment {
         // define glolab vars
-        //foo="bar"
+        MVN_CMD = "mvn -s nexus-settings.xml"
 
         PIPELINES_NAMESPACE = "will-cicd-jenkins"
         
@@ -54,7 +53,7 @@ pipeline {
                 timeout(time: 3, unit: 'MINUTES')
             }
             steps {
-                sh "${mvnCmd} clean install -DskipTests=true"
+                sh "${env.MVN_CMD} clean install -DskipTests=true"
             }
         }
         stage('Test') {
@@ -62,7 +61,7 @@ pipeline {
                 timeout(time: 3, unit: 'MINUTES')
             }
             steps {
-                sh "${mvnCmd} test"
+                sh "${env.MVN_CMD} test"
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
             }
         }
@@ -75,7 +74,7 @@ pipeline {
                     // need install SonarQube Scanner plugin and configure SonarQube server in Jenkins
                     // -Dsonar.host.url=http://sonarqube-sonarqube.will-cicd-sonarqube:9000
                     withSonarQubeEnv('sonarqube') {
-                        sh "${mvnCmd} install sonar:sonar -DskipTests=true"
+                        sh "${env.MVN_CMD} install sonar:sonar -DskipTests=true"
                     }
                 }
             }
@@ -89,7 +88,7 @@ pipeline {
                 // create `jenkins-user` Nexus user with this role
                 // configure `jenkins-user` server login information for repositories and mirror in settings.xml
                 // configure repository information in `distributionManagement` of pom.xml
-                sh "${mvnCmd} deploy -DskipTests=true"
+                sh "${env.MVN_CMD} deploy -DskipTests=true"
             }
         }
         stage('Build Image') {
