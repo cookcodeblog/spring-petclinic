@@ -26,12 +26,14 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '50', artifactNumToKeepStr: '1'))
-        timeout(time: 20, unit: 'MINUTES')
         ansiColor('xterm')
     }
 
     stages {
         stage('Prepare Environment') {
+            options {
+                timeout(time: 1, unit: 'MINUTES')
+            }
             steps {
                 // https://e.printstacktrace.blog/jenkins-pipeline-environment-variables-the-definitive-guide/
                 // https://{JENKINS_HOST}/env-vars.html/
@@ -45,17 +47,26 @@ pipeline {
             }
         }
         stage('Build App') {
+            options {
+                timeout(time: 3, unit: 'MINUTES')
+            }
             steps {
                 sh "${mvnCmd} clean install -DskipTests=true"
             }
         }
         stage('Test') {
+            options {
+                timeout(time: 3, unit: 'MINUTES')
+            }
             steps {
                 sh "${mvnCmd} test"
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
             }
         }
         stage('Code Analysis') {
+            options {
+                timeout(time: 3, unit: 'MINUTES')
+            }
             steps {
                 script {
                     // need install SonarQube Scanner plugin and configure SonarQube server in Jenkins
@@ -67,6 +78,9 @@ pipeline {
             }
         }
         stage('Archive App') {
+            options {
+                timeout(time: 2, unit: 'MINUTES')
+            }
             steps {
                 // need create `nx-deploy` Nexus role with `nx-repository-view-*-*-*` privileges
                 // create `jenkins-user` Nexus user with this role
@@ -76,6 +90,9 @@ pipeline {
             }
         }
         stage('Build Image') {
+            options {
+                timeout(time: 2, unit: 'MINUTES')
+            }
             steps {
                 sh "cp target/${env.APP_NAME}-*.jar target/app.jar"
                 script {
@@ -97,6 +114,9 @@ pipeline {
             }
         }
         stage('Deploy Image') {
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+            }
             steps {
                 script {
                     openshift.withCluster() {
