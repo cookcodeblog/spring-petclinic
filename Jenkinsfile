@@ -1,6 +1,7 @@
 def mvnCmd = "mvn -s nexus-settings.xml"
 pipeline {
     agent {
+        // global agent
         label "maven"
     }
 
@@ -27,6 +28,9 @@ pipeline {
     options {
         buildDiscarder(logRotator(numToKeepStr: '50', artifactNumToKeepStr: '1'))
         ansiColor('xterm')
+        // the whole pipeline timeout
+        // also recommend to set tiemout at each stage
+        timeout(time: 20, unit: 'MINUTES')
     }
 
     stages {
@@ -115,7 +119,7 @@ pipeline {
         }
         stage('Deploy Image') {
             options {
-                timeout(time: 10, unit: 'MINUTES')
+                timeout(time: 1, unit: 'MINUTES')
             }
             steps {
                 script {
@@ -127,6 +131,20 @@ pipeline {
                             sh """
                                 oc set image deployment ${env.APP_DEPLOYMENT} ${env.APP_IMAGE}=${env.IMAGE_REGISTRY}/${env.APP_IMAGE}:${env.APP_VERSION} -n ${env.PROJECT_NAMESPACE}
                             """
+                        }
+                    }
+                }
+            }
+        }
+        stage('Smoke Test') {
+            agent none
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+            }
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject("${env.PROJECT_NAMESPACE}") {
                             // watch until the rollout complete
                             openshift.selector("deployment", "${env.APP_DEPLOYMENT}").rollout().status("-w")
                         }
