@@ -90,9 +90,11 @@ pipeline {
             }
         }
         stage('Deploy Image') {
-            openshift.withCluster() {
-                openshift.withProject("${env.PROJECT_NAMESPACE}") {
-                    openshift.selector("deployment", "${env.APP_DEPLOYMENT}").rollout().latest();
+            steps {}
+                openshift.withCluster() {
+                    openshift.withProject("${env.PROJECT_NAMESPACE}") {
+                        openshift.selector("deployment", "${env.APP_DEPLOYMENT}").rollout().latest()
+                    }
                 }
             }
         }
