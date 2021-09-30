@@ -9,12 +9,15 @@ pipeline {
         //foo="bar"
 
         PIPELINES_NAMESPACE = "will-cicd-jenkins"
+        
 
         // applicaiton info
         PROJECT_NAMESPACE = "will-petclinic"
         APP_NAME = "spring-petclinic"
         APP_BUILD_CONFIG = "${env.APP_NAME}"
         APP_DEPLOYMENT = "${env.APP_NAME}"
+        IMAGE_REGISTRY = "image-registry.openshift-image-registry.svc:5000/${env.PROJECT_NAMESPACE}/"
+        APP_IMAGE = "${env.APP_NAME}"
         APP_GIT_MAIN_BRANCH = "main"
         // TODO App version
         APP_VERSION = "0.0.1"
@@ -79,9 +82,13 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject("${env.PROJECT_NAMESPACE}") {
                             // start a build for selected openshift build config
-                            openshift.selector("bc", "${env.APP_BUILD_CONFIG}").startBuild("--from-file=target/app.jar", "--wait=true")
+                            // --from-file='': A file to use as the binary input for the build; 
+                            // example a pom.xml or Dockerfile. Will be the only file in the build source
+                            // wait until the build complete
+                            openshift.selector("bc", "${env.APP_BUILD_CONFIG}").startBuild("--from-file=target/app.jar", "-w")
                             // tag image
-                            openshift.tag("${env.APP_NAME}:latest", "${env.APP_NAME}:${env.APP_VERSION}")
+                            // run `oc get imagestream` to check image tags
+                            openshift.tag("${env.APP_IMAGE}:latest", "${env.APP_IMAGE}:${env.APP_VERSION}")
                             // TODO push image to external image registry
                             // TODO git tag
                         }
@@ -94,7 +101,14 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${env.PROJECT_NAMESPACE}") {
-                            openshift.selector("deployment", "${env.APP_DEPLOYMENT}").rollout().latest()
+                            // Only DeploymentConfig can use rollout().latest()
+                            // Use `oc set iamge deployment` to update image vesion inside deployment
+                            // Nee set image change trigger for deployment
+                            sh """
+                                oc set image deployment ${env.APP_DEPLOYMENT} ${env.APP_IMAGE}=${env.IMAGE_REGISTRY}/${env.APP_IMAGE}:${env.APP_VERSION} -n ${env.PROJECT_NAMESPACE}
+                            """
+                            // watch until the rollout complete
+                            openshift.selector("deployment", "${env.APP_DEPLOYMENT}").rollout().status("-w")
                         }
                     }
                 }
