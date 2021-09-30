@@ -64,7 +64,7 @@ spec:
             path: /actuator/health
             port: 8080
             scheme: HTTP
-          initialDelaySeconds: 100
+          initialDelaySeconds: 5
           periodSeconds: 3
           successThreshold: 1
           timeoutSeconds: 1
@@ -82,7 +82,7 @@ spec:
             path: /actuator/health
             port: 8080
             scheme: HTTP
-          initialDelaySeconds: 40
+          initialDelaySeconds: 5
           periodSeconds: 3
           successThreshold: 1
           timeoutSeconds: 1
@@ -99,7 +99,7 @@ spec:
             path: /actuator/health
             port: 8080
             scheme: HTTP
-          initialDelaySeconds: 100
+          initialDelaySeconds: 30
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
