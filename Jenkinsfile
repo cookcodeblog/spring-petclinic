@@ -1,6 +1,8 @@
 def mvnCmd = "mvn -s nexus-settings.xml"
 pipeline {
-    agent none
+    agent {
+        label 'maven'
+    }
 
     environment {
         // define glolab vars
@@ -48,9 +50,6 @@ pipeline {
             }
         }
         stage('Build App') {
-            agent {
-                label 'maven'
-            }
             options {
                 timeout(time: 3, unit: 'MINUTES')
             }
@@ -59,9 +58,6 @@ pipeline {
             }
         }
         stage('Test') {
-            agent {
-                label 'maven'
-            }
             options {
                 timeout(time: 3, unit: 'MINUTES')
             }
@@ -71,9 +67,6 @@ pipeline {
             }
         }
         stage('Code Analysis') {
-            agent {
-                label 'maven'
-            }
             options {
                 timeout(time: 3, unit: 'MINUTES')
             }
@@ -88,9 +81,6 @@ pipeline {
             }
         }
         stage('Archive App') {
-            agent {
-                label 'maven'
-            }
             options {
                 timeout(time: 2, unit: 'MINUTES')
             }
@@ -103,9 +93,6 @@ pipeline {
             }
         }
         stage('Build Image') {
-            agent {
-                label 'maven'
-            }
             options {
                 timeout(time: 2, unit: 'MINUTES')
             }
