@@ -90,7 +90,7 @@ pipeline {
             }
         }
         stage('Deploy Image') {
-            steps {}
+            steps {
                 openshift.withCluster() {
                     openshift.withProject("${env.PROJECT_NAMESPACE}") {
                         openshift.selector("deployment", "${env.APP_DEPLOYMENT}").rollout().latest()
