@@ -87,7 +87,7 @@ pipeline {
                             // wait until the build complete
                             openshift.selector("bc", "${env.APP_BUILD_CONFIG}").startBuild("--from-file=target/app.jar", "-w")
                             // tag image
-                            // run `oc get imagestream` to check image tags
+                            // run `oc get imagestream` and `oc get imagestreamtag` to check image tags
                             openshift.tag("${env.APP_IMAGE}:latest", "${env.APP_IMAGE}:${env.APP_VERSION}")
                             // TODO push image to external image registry
                             // TODO git tag
